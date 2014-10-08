@@ -22,7 +22,7 @@ p <- shapes %>%
 print(p)
 ```
 
-```{r}
+```{r, warning=FALSE, message=FALSE}
 library(ggmap)
 map <- get_map(location = 'São Paulo, SP, Brazil', zoom = 10, maptype='roadmap')
 p <- map %>%
