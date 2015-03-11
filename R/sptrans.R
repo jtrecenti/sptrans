@@ -55,8 +55,8 @@ olhovivo_pega_posicoes_linhas <- function(cod_linhas) {
 }
 
 pega_bus <- function(color) {
-  l <- list.files(system.file('icons', package = 'sptrans'), full.names = TRUE)
-  path <- l[stringr::str_detect(l, sprintf('%d-bus-[a-z]+\\.png', color))]
+  base <- 'https://github.com/jtrecenti/sptrans/blob/tree/master/inst'
+  l <- sprintf('%s/icons/%d-bus.png')
   js <- invisible(JS(sprintf("L.icon({ iconUrl: '%s', iconSize: [32, 37] })", path)))
   js
 }
