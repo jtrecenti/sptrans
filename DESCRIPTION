@@ -9,3 +9,10 @@ LazyData: true
 Suggests: knitr,
     testthat
 VignetteBuilder: knitr
+Imports: dplyr,
+    stringr,
+    shiny,
+    htmltools,
+    leaflet,
+    httr,
+    jsonlite
