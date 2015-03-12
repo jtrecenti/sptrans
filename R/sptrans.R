@@ -26,6 +26,9 @@ olhovivo_pega_posicao <- function(cod_linha_olhovivo) {
   r_busca_posicoes <- httr::GET(u_busca_posicoes)
   l_busca_posicoes <- jsonlite::fromJSON(httr::content(r_busca_posicoes, 'text'))
   d_busca_posicoes <- l_busca_posicoes$vs
+  if(!is.data.frame(d_busca_posicoes)) {
+    return(data.frame())
+  }
   return(d_busca_posicoes)
 }
 
