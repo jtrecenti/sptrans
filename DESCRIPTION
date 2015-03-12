@@ -3,7 +3,7 @@ Title: API Olho Vivo SPTrans e Outros Dados
 Version: 0.0.0.9000
 Authors@R: person("Julio", "Trecenti", , "julio.trecenti@gmail.com", role = c("aut", "cre"))
 Description: Pacote com ferramentas para facilitar uso da API Olho Vivo SPTrans e desenhar no mapa.
-Depends: R (>= 3.1.3)
+Depends: R (>= 3.1.2)
 License: MIT
 LazyData: true
 Suggests: knitr,

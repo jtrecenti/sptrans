@@ -31,8 +31,6 @@ m0 <- leaflet_desenha_shapes(shape_ids = cods$shape_id) %>%
              data = distinct(cods, stop_id.x)) %>%
   setView(-46.65431, -23.55924, 19)
 
-olhovivo_login()
-
 shinyServer(function(session, input, output) {
   
   output$map <- renderLeaflet({
