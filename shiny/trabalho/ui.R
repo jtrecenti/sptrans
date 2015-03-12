@@ -3,5 +3,5 @@ library(leaflet)
 
 shinyUI(fluidPage(
   includeCSS('www/sty.css'), 
-  tags$div(id = 'divL', leafletOutput('map', height = 600))
+  tags$div(id = 'divL', leafletOutput('map', height = 400))
 ))

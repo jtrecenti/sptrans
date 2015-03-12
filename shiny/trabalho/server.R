@@ -1,5 +1,4 @@
 library(shiny)
-library(sptrans)
 library(dplyr)
 library(stringr)
 library(leaflet)
@@ -29,16 +28,14 @@ m0 <- leaflet_desenha_shapes(shape_ids = cods$shape_id) %>%
              lat = ~ stop_lat,
              popup = ~ label,
              data = distinct(cods, stop_id.x)) %>%
-  setView(-46.65431, -23.55924, 19)
-
-olhovivo_login()
+  setView(-46.65431, -23.55924, 17)
 
 shinyServer(function(session, input, output) {
   
   output$map <- renderLeaflet({
     invalidateLater(10000, session)
     leaflet_mapeia_linhas(cods$route_id, sentido = cods$direction_id, m0) %>%
-      setView(-46.65431, -23.55924, 18)
+      setView(-46.65431, -23.55924, 17)
   })
   
 })

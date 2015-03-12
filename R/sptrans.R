@@ -26,6 +26,9 @@ olhovivo_pega_posicao <- function(cod_linha_olhovivo) {
   r_busca_posicoes <- httr::GET(u_busca_posicoes)
   l_busca_posicoes <- jsonlite::fromJSON(httr::content(r_busca_posicoes, 'text'))
   d_busca_posicoes <- l_busca_posicoes$vs
+  if(!is.data.frame(d_busca_posicoes)) {
+    return(data.frame())
+  }
   return(d_busca_posicoes)
 }
 
@@ -35,7 +38,6 @@ olhovivo_pega_posicoes_linha <- function(cod_linha) {
   u_busca_linhas <- paste0(u, '/Linha/Buscar?termosBusca=', cod_linha)
   r_busca_linhas <- httr::GET(u_busca_linhas)
   d_busca_linhas <- jsonlite::fromJSON(httr::content(r_busca_linhas, 'text'))
-  cod_linha_olhovivo <- d_busca_linhas$CodigoLinha[1]
   d_busca_linhas_gr <- dplyr::group_by_(d_busca_linhas, .dots = names(d_busca_linhas))
   d_posicoes <- dplyr::do(d_busca_linhas_gr, olhovivo_pega_posicao(.$CodigoLinha))
   d_posicoes <- dplyr::ungroup(d_posicoes)
