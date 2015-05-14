@@ -1,88 +1,70 @@
 ---
-title: "Pacote SPTrans"
+title: "SPTrans no R!"
 author: "Julio Trecenti"
 date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{Pacote SPTrans}
+  %\VignetteIndexEntry{SPTrans no R!}
   %\VignetteEngine{knitr::rmarkdown}
   \usepackage[utf8]{inputenc}
 ---
 
-Vignettes are long form documentation commonly included in packages. Because they are part of the distribution of the package, they need to be as compact as possible. The `html_vignette` output type provides a custom style sheet (and tweaks some options) to ensure that the resulting html is as small as possible. The `html_vignette` format:
+A SPTrans nasceu em 1995 e é hoje responsável por quase todo o sistema de
+transporte no município de São Paulo. Como São Paulo é o município mais
+populoso do Brasil (e o 
+[sétimo do mundo!](http://pt.wikipedia.org/wiki/Lista_das_cidades_mais_populosas_do_mundo))
+, o desafio é bem grande.
 
-- Never uses retina figures
-- Has a smaller default figure size
-- Uses a custom CSS stylesheet instead of the default Twitter Bootstrap style
+A SPTrans também mantém uma das API's mais divertidas de São Paulo, o OlhoVivo.
+Com essa API é possível extrair informações em tempo real da localização
+de todos os ônibus, previsões de chegada, etc. Além disso, ela utiliza os
+padrões [GTFS](http://www.sptrans.com.br/desenvolvedores/GTFS.aspx) para 
+organizar informações sobre as linhas ativas, os pontos de ônibus e tudo mais.
 
-## Vignette Info
+Hoje em dia, temos diversos aplicativos mobile e sites que usam essa API.
+Faça uma busca por "sptrans" na Google Play, por exemplo, e verá muitos
+apps que ajudam a planejar rotas de ônibus.
 
-Note the various macros within the `vignette` setion of the metadata block above. These are required in order to instruct R how to build the vignette. Note that you should change the `title` field and the `\VignetteIndexEntry` to match the title of your vignette.
+E por que não brincar com essas informações no R? Bom, pensando nisso fiz esse
+pacote, que ajuda a configurar a API, baixar os dados da SPTrans em tempo real
+e criar alguns gráficos básicos usando o pacote 
+[`leaflet` do RStudio](https://rstudio.github.io/leaflet/).
 
-## Styles
+## Instalando o pacote
 
-The `html_vignette` template includes a basic CSS theme. To override this theme you can specify your own CSS in the document metadata as follows:
+O pacote ainda não está disponível no CRAN. Para instalar via GitHub, você
+precisará do pacote devtools e rodar
 
-    output: 
-      rmarkdown::html_vignette:
-        css: mystyles.css
-
-## Figures
-
-The figure sizes have been customised so that you can easily put two images side-by-side. 
-
-```{r, fig.show='hold'}
-plot(1:10)
-plot(10:1)
+```{r eval=FALSE}
+devtools::install_github('jtrecenti/sptrans')
 ```
 
-You can enable figure captions by `fig_caption: yes` in YAML:
+Carregue o pacote com o comando `library` 
 
-    output:
-      rmarkdown::html_vignette:
-        fig_caption: yes
-
-Then you can use the chunk option `fig.cap = "Your figure caption."` in **knitr**.
-
-## More Examples
-
-You can write math expressions, e.g. $Y = X\beta + \epsilon$, footnotes^[A footnote here.], and tables, e.g. using `knitr::kable()`.
-
-```{r, echo=FALSE, results='asis'}
-knitr::kable(head(mtcars, 10))
+```{r}
+library(sptrans)
 ```
 
-Also a quote using `>`:
+## Utilizando a API OlhoVivo
 
-> "He who gives up [code] safety for [code] speed deserves neither."
-([via](https://twitter.com/hadleywickham/status/504368538874703872))
+Para acessar a API OlhoVivo, você precisará primeiro de um _token_ de acesso,
+que é uma sequência de letras e números geradas aleatoriamente pela SPTrans,
+por exemplo:
 
-_____
-
-```{r, warning=FALSE, message=FALSE}
-# Bibliotecas usadas
-# library(dplyr)
-# library(ggplot2)
-# load('shapes.RData')
 ```
-
-```{r, warning=FALSE, message=FALSE}
-# p <- shapes %>%
-#   ggplot(aes(x=shape_pt_lon, y=shape_pt_lat, colour=shape_id, group=shape_id)) +
-#   geom_path(alpha=.1) +
-#   coord_equal() +
-#   theme_bw()
-# print(p)
-```
-
-```{r, warning=FALSE, message=FALSE}
-# library(ggmap)
-# map <- get_map(location = 'São Paulo, SP, Brazil', zoom = 10, maptype='roadmap')
-# p <- map %>% ggmap +
-#   geom_path(aes(x=shape_pt_lon, y=shape_pt_lat, group=shape_id), colour='red', data=shapes, alpha=.1)
-# print(p)
+233f343e2ad2a3bf483eae00c316cfdd516c3xxxd21b6a3e916645877e137b6f
 ```
 
 
 
+## Criando visualizações
 
+## Analisando os dados do GTFS
+
+## Shiny app
+
+## Agradecimentos
+
+A Hadley Wickham, que fez um 
+[tutorial muito útil](https://github.com/hadley/httr/blob/master/vignettes/api-packages.Rmd)
+para criação de API's.
