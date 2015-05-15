@@ -2,7 +2,7 @@
 title: "SPTrans no R!"
 author: "Julio Trecenti"
 date: "`r Sys.Date()`"
-output: rmarkdown::html_vignette
+#output: rmarkdown::html
 vignette: >
   %\VignetteIndexEntry{SPTrans no R!}
   %\VignetteEngine{knitr::rmarkdown}
@@ -18,8 +18,9 @@ populoso do Brasil (e o
 A SPTrans também mantém uma das API's mais divertidas de São Paulo, o OlhoVivo.
 Com essa API é possível extrair informações em tempo real da localização
 de todos os ônibus, previsões de chegada, etc. Além disso, ela utiliza os
-padrões [GTFS](http://www.sptrans.com.br/desenvolvedores/GTFS.aspx) para 
-organizar informações sobre as linhas ativas, os pontos de ônibus e tudo mais.
+padrões [GTFS](https://developers.google.com/transit/gtfs/reference?hl=pt-br) 
+para organizar informações sobre as linhas ativas, os pontos de ônibus e tudo
+mais.
 
 Hoje em dia, temos diversos aplicativos mobile e sites que usam essa API.
 Faça uma busca por "sptrans" na Google Play, por exemplo, e verá muitos
@@ -28,24 +29,26 @@ apps que ajudam a planejar rotas de ônibus.
 E por que não brincar com essas informações no R? Bom, pensando nisso fiz esse
 pacote, que ajuda a configurar a API, baixar os dados da SPTrans em tempo real
 e criar alguns gráficos básicos usando o pacote 
-[`leaflet` do RStudio](https://rstudio.github.io/leaflet/).
+[`leaflet`](https://rstudio.github.io/leaflet/) do RStudio.
 
 ## Instalando o pacote
 
 O pacote ainda não está disponível no CRAN. Para instalar via GitHub, você
-precisará do pacote devtools e rodar
+precisará instalar o pacote `devtools` e então rodar
 
 ```{r eval=FALSE}
-devtools::install_github('jtrecenti/sptrans')
+devtools::install_github('jtrecenti/spgtfs') # dados GTFS
+devtools::install_github('jtrecenti/sptrans') # funcoes e API
 ```
 
 Carregue o pacote com o comando `library` 
 
 ```{r}
+library(spgtfs)
 library(sptrans)
 ```
 
-## Utilizando a API OlhoVivo
+## Configurando a API OlhoVivo
 
 Para acessar a API OlhoVivo, você precisará primeiro de um _token_ de acesso,
 que é uma sequência de letras e números geradas aleatoriamente pela SPTrans,
@@ -55,16 +58,221 @@ por exemplo:
 233f343e2ad2a3bf483eae00c316cfdd516c3xxxd21b6a3e916645877e137b6f
 ```
 
+Para isso, siga os seguintes passos
+
+1. Acesse a [área de desenvolvedores da SPTrans](http://www.sptrans.com.br/desenvolvedores/Cadastro.aspx) 
+e crie uma conta.  
+2. Quando conseguir logar, acesse a página "Meus Aplicativos" da API Olho Vivo,
+e clique em "Adicionar novo aplicativo".  
+3. Preencha o formulário com suas informações. Só é necessário preencher o nome
+e a descrição. Você pode escolher o nome que quiser. Se tudo der certo, você 
+receberá um token de acesso.  
+4. Vá para a pasta "home" de seu usuário (se não souber o que é isso, rode
+`normalizePath("~/")` no R.).
+5. Crie/edite um arquivo chamado `.Renviron` (isso mesmo, com um ponto na 
+frente) e coloque o conteúdo
+
+```
+OLHOVIVO_PAT=seu_token_aqui
+
+```
+
+Por exemplo:
+
+```
+OLHOVIVO_PAT=233f343e2ad2a3bf483eae00c316cfdd516c3xxxd21b6a3e916645877e137b6f
+
+```
+
+**OBS:** O arquivo `.Renviron` deve ter uma linha vazia no final. Por exemplo,
+se seu arquivo contém só o token da API OlhoVivo, seu 
+
+6. Reinicie sua sessão do R. Um jeito fácil de fazer isso no RStudio é pelo
+atalho `Ctrl + Shift + F10`.
+
+**Testando se está OK:** O token é acessado pela função `Sys.getenv()` do R.
+Após realizar os passos descritos, experimente rodar 
+`Sys.getenv('OLHOVIVO_PAT')`. Eu adicionei uma função no pacote chamada
+`check_olhovivo()` que faz exatamente isso. Se tudo estiver certo, a função 
+imprimirá o seu token e você poderá partir para o próximo passo!
+
+Se encontrar algum problema, acesse 
+[essa página](https://github.com/hadley/httr/blob/master/vignettes/api-packages.Rmd#appendix-api-key-best-practices)
+, que foi utilizada como base para criar este pacote.
 
 
-## Criando visualizações
+## Dados do GTFS
 
-## Analisando os dados do GTFS
+Antes de sair baixando informações usando a API OlhoVivo, vamos ver um pouco
+mais a fundo o que é essa GTFS, para que serve, e como utilizar esses dados
+no nosso pacote. 
 
-## Shiny app
+A Especificação Geral sobre Feeds de Transporte Público é uma padronização
+de arquivos para que qualquer lugar do mundo possa divulgar informações
+de transporte público num formato único. Isso possibilita empresas como a
+[Google](www.google.com) e o aplicativo [Moovit](http://moovitapp.com/pt-br/)
+a juntar as informações de vários lugares sem muito trabalho. O padrão
+também ajuda os responsáveis pela obteção dos dados, pois é mais fácil
+seguir um guia do que planejar a estrutura de dados do zero.
+
+Os dados e a documentação da GTFS estão no pacote `spgtfs`. Após carregar os
+dados, é possível visualizar os bds disponíveis em `data(package = 'spgtfs')`. 
+Se quiser, por exemplo, verificar a documentação de `shapes`, rode `?shapes`.
+É recomendável que o pacote `dplyr` seja carregado antes de trabalhar com
+esses dados, para não correr o risco de imprimir dez mil linhas no console.
+
+Vejamos, por exemplo, as linhas de ônibus contidas em `trips`:
+
+```{r}
+head(trips, 10)
+```
+
+### Brincando com o GTFS
+
+As informações do GTFS, por si só, já são bastante úteis.
+
+- Com `trips`, sabemos todas as linhas de ônibus. 
+- Com `stops`, sabemos todas as paradas. 
+- Com `stop_times`, conseguimos descobrir quais linhas passam em quais pontos.
+- Com `shapes`, sabemos todos os trajetos no mapa.
+
+Com a ajuda do pacote `ggmap`, é possível utilizar a API do google para obter 
+coordenadas geográficas a partir de endereços. 
+
+Vamos às funções do pacote!
+
+A função `nearby_stops` procura pontos de ônibus próximos a um endereço 
+informado. Os pontos próximos são identificados dentro de um raio que por 
+padrão é de 300 metros.
+
+Veja alguns exemplos:
+
+Utilização básica.
+
+```{r}
+nearby_stops('Avenida Paulista, 1079')
+```
+
+Neste exemplo, não encontramos nenhum ponto de ônibus.
+
+```{r eval=FALSE}
+nearby_stops('Avenida Paulista, 1079', radius = 100)
+```
+
+Também é possível informar latitude e longitude.
+
+```{r}
+nearby_stops(lon = -46.6527, lat = -23.5648)
+```
+
+A função `draw_stops` desenha o ponto informado, o raio informado, e os pontos
+de ônibus próximos.
+
+```{r, fig.width=7, fig.height=7}
+nearby_stops('Avenida Paulista, 1079', 200) %>% draw_stops()
+```
+
+A função `search_path` procura possíveis caminhos de um ponto até outro ponto,
+ou seja, procura linhas de ônibus (trips) que passem próximos a duas 
+localizações informadas. Até o momento, ainda não é possível identificar 
+caminhos com utilização de duas linhas distintas.
+
+```{r}
+search_path(end1 = 'Avenida 9 de Julho, 2000, São Paulo', 
+            end2 = 'Av. Pres. Juscelino Kubitschek, 500, São Paulo')
+```
+
+A função `draw_paths` desenha os dois pontos informados, os raios informados,
+os pontos de ônibus válidos e os caminhos possíveis (no máximo oito).
+
+```{r, fig.width=7, fig.height=7}
+search_path(end1 = 'Avenida 9 de Julho, 2000, São Paulo', 
+            end2 = 'Av. Pres. Juscelino Kubitschek, 500, São Paulo') %>%
+  draw_paths()
+```
+
+Outro exemplo, aumentando o raio 2.
+
+```{r, fig.width=7, fig.height=7}
+search_path(end1 = 'Avenida 9 de Julho, 2000, São Paulo', 
+            end2 = 'Av. Pres. Juscelino Kubitschek, 500, São Paulo',
+            radius2 = 500) %>%
+  dplyr::filter(!stringr::str_detect(trip_headsign, 
+                                     'Santana|Luz|Band|Armenia|Pedro Ii')) %>%
+  # Obs: tirei manualmente as linhas que vão para o lado oposto ao que eu
+  # quero, isto é, que vão da JK até a 9 de Julho.
+  # Esse é um problema conhecido do pacote.
+  draw_paths()
+```
+
+
+## Obtendo informações online
+
+Na versão atual do pacote, temos a função `colect_bus`, que torna possível 
+obter as localizações de ônibus a partir de:
+
+- Um conjunto de linhas. Nesse caso, a função retorna a localização em tempo
+real de todos os ônibus nas linhas informadas.
+
+```{r}
+trip_ids <- search_path(end1 = 'Avenida 9 de Julho, 2000, São Paulo', 
+                        end2 = 'Av. Pres. Juscelino Kubitschek, 500, São Paulo')
+
+trip_ids %>% collect_bus(trip_id, 'trip')
+```
+
+- Um conjunto de rotas. Nesse caso, a função retorna a localização em tempo
+real de todos os ônibus nas rotas informadas (lembrando, uma rota pode 
+corresponder a uma ou duas linhas).
+
+```{r}
+trip_ids %>% collect_bus(route_id, 'routes')
+```
+
+Para desenhar os ônibus no mapa, basta chamar a função `draw_bus()`.
+
+```{r}
+trip_ids %>% 
+  collect_bus(trip_id, 'trip') %>%
+  draw_bus()
+```
+
+É possível desenhar tanto os ônibus em tempo real quanto os caminhos da
+função `draw_paths`
+
+```{r}
+m <- trip_ids %>% draw_paths()
+trip_ids %>%
+  collect_bus(trip_id, 'trip') %>%
+  draw_bus(m)
+```
+
+
+Observe que os ônibus realmente andam!
+
+```{r}
+Sys.sleep(10)
+trip_ids %>% 
+  collect_bus(trip_id, 'trip') %>%
+  draw_bus()
+```
+
+## TODO
+
+- Previsão de chegada de ônibus nos pontos.
+- Melhorar documentação e dat @export em mais funções.
+- Adicionar testes e tratamento de exceções.
+- Se tiver alguma sugestão ou uma pull request, adicione um issue na 
+[página do github](https://github.com/jtrecenti/sptrans).
+
+## Known Issues
+
+- Não trabalha bem com trips no GTFS. Difícil colocar paths somente de "ida" e
+não de "volta".
 
 ## Agradecimentos
 
-A Hadley Wickham, que fez um 
+- A Hadley Wickham, que fez um 
 [tutorial muito útil](https://github.com/hadley/httr/blob/master/vignettes/api-packages.Rmd)
-para criação de API's.
+para criação pacotes no R baseados em API's, e por contribuir no fantástico
+pacote `ggmap`.
