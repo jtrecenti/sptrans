@@ -308,11 +308,26 @@ corresponder a uma ou duas linhas).
 
 
 ```r
-trip_ids %>% collect_bus(route_id, 'routes')
+trip_ids %>% collect_bus(route_id, 'route')
 ```
 
 ```
-## NULL
+## Source: local data frame [24 x 13]
+## 
+##    CodigoLinha     p     a        py        px route_id Circular Letreiro
+## 1          359 76854 FALSE -23.57679 -46.67092  6401-10    FALSE     6401
+## 2          359 76901 FALSE -23.54918 -46.63986  6401-10    FALSE     6401
+## 3          359 76038  TRUE -23.53626 -46.63690  6401-10    FALSE     6401
+## 4          359 76899 FALSE -23.59435 -46.68866  6401-10    FALSE     6401
+## 5          516 23027  TRUE -23.59562 -46.68837  106A-10    FALSE     106A
+## 6          516 23032  TRUE -23.58950 -46.68815  106A-10    FALSE     106A
+## 7          516 11953  TRUE -23.54314 -46.63550  106A-10    FALSE     106A
+## 8          516 23026  TRUE -23.58923 -46.68805  106A-10    FALSE     106A
+## 9          516 23039  TRUE -23.55542 -46.64947  106A-10    FALSE     106A
+## 10         516 23056  TRUE -23.52826 -46.63168  106A-10    FALSE     106A
+## ..         ...   ...   ...       ...       ...      ...      ...      ...
+## Variables not shown: Sentido (int), Tipo (int), DenominacaoTPTS (chr),
+##   DenominacaoTSTP (chr), Informacoes (lgl)
 ```
 
 Para desenhar os ônibus no mapa, basta chamar a função `draw_bus()`.

@@ -226,7 +226,7 @@ real de todos os ônibus nas rotas informadas (lembrando, uma rota pode
 corresponder a uma ou duas linhas).
 
 ```{r}
-trip_ids %>% collect_bus(route_id, 'routes')
+trip_ids %>% collect_bus(route_id, 'route')
 ```
 
 Para desenhar os ônibus no mapa, basta chamar a função `draw_bus()`.
