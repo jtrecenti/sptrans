@@ -1,31 +1,14 @@
-#' @export
-url_base <- function() {
-  u <- 'http://api.olhovivo.sptrans.com.br/v0'
-  u
-}
-
-#' @export
-olhovivo_login <- function(token = NULL) {
-  if(is.null(token)) {
-    token <- '233f343e2ad2a3bf483eae00c316cfdd516c3bbbd21b6a3e916645877e137b6f'
-  }
-  u <- url_base()
-  u_login <- paste0(u, '/Login/Autenticar?token=', token)
-  r <- httr::POST(u_login)
-  result <-httr::content(r, 'text')
-  if(result == 'true') {
-    cat('Login realizado com sucesso!\n')
-    return(r)
-  } else {
-    stop('Ocorreu um erro ao acessar a API da SPTrans.')
-  }
-}
+# -----------------------------------------------------------------------------
+# DEPRECATED.
+# Essas funcoes serao utilizadas no futuro para montar a nova "API" do pacote.
+# -----------------------------------------------------------------------------
 
 olhovivo_pega_posicao <- function(cod_linha_olhovivo) {
   u <- url_base()
   u_busca_posicoes <- paste0(u, '/Posicao?codigoLinha=', cod_linha_olhovivo)
   r_busca_posicoes <- httr::GET(u_busca_posicoes)
-  l_busca_posicoes <- jsonlite::fromJSON(httr::content(r_busca_posicoes, 'text'))
+  l_busca_posicoes <- jsonlite::fromJSON(httr::content(r_busca_posicoes, 
+                                                       'text'))
   d_busca_posicoes <- l_busca_posicoes$vs
   if(!is.data.frame(d_busca_posicoes)) {
     return(data.frame())
@@ -33,16 +16,16 @@ olhovivo_pega_posicao <- function(cod_linha_olhovivo) {
   return(d_busca_posicoes)
 }
 
-#' @export
 olhovivo_pega_posicoes_linha <- function(cod_linha) {
   d_busca_linhas <- olhovivo_pega_linha(cod_linha)
-  d_busca_linhas_gr <- dplyr::group_by_(d_busca_linhas, .dots = names(d_busca_linhas))
-  d_posicoes <- dplyr::do(d_busca_linhas_gr, olhovivo_pega_posicao(.$CodigoLinha))
+  d_busca_linhas_gr <- dplyr::group_by_(d_busca_linhas, 
+                                        .dots = names(d_busca_linhas))
+  d_posicoes <- dplyr::do(d_busca_linhas_gr, 
+                          olhovivo_pega_posicao(.$CodigoLinha))
   d_posicoes <- dplyr::ungroup(d_posicoes)
   return(d_posicoes)
 }
 
-#' @export
 olhovivo_pega_posicoes_linhas <- function(cod_linhas) {
   cod_linhas <- unique(cod_linhas)
   if(length(cod_linhas) > 10) {
@@ -55,7 +38,8 @@ olhovivo_pega_posicoes_linhas <- function(cod_linhas) {
   d
 }
 
-#' @export
+# -----------------------------------------------------------------------------
+
 olhovivo_pega_linha <- function(cod_linha) {
   u <- url_base()
   u_busca_linhas <- paste0(u, '/Linha/Buscar?termosBusca=', cod_linha)
@@ -64,7 +48,7 @@ olhovivo_pega_linha <- function(cod_linha) {
   d_busca_linhas
 }
 
-#' @export
+
 olhovivo_pega_linhas <- function(cod_linhas) {
   d <- dplyr::data_frame(linha = cod_linhas)
   d <- dplyr::group_by(d, linha)
@@ -73,40 +57,6 @@ olhovivo_pega_linhas <- function(cod_linhas) {
   d
 }
 
-#' @export
-olhovivo_pega_previsao_linhas_paradas <- function(cod_linhas, cod_paradas) {
-  linhas_olhovivo <- olhovivo_pega_linhas(cod_linhas)
-  comb <- expand.grid(
-    CodigoLinha = unique(linhas_olhovivo$CodigoLinha), 
-    stop_id = unique(as.numeric(cod_paradas)),
-    stringsAsFactors = FALSE
-  )
-  comb <- dplyr::inner_join(comb, linhas_olhovivo, c('CodigoLinha'))
-  comb <- dplyr::mutate(comb, direction = as.numeric(Sentido) - 1)
-  comb <- tidyr::unite(comb, trip_id, Letreiro, Tipo, direction, sep = '-', remove = F)
-  # verifica na base stop_times se existe a combinacao
-  comb <- dplyr::semi_join(comb, stop_times, c('trip_id', 'stop_id'))
-  comb <- dplyr::group_by_(comb, .dots = names(comb))
-  d <- dplyr::do(comb, olhovivo_pega_previsao_linha_parada(.$CodigoLinha, .$stop_id))
-  d <- dplyr::ungroup(d)
-  d
-}
-
-#' @export
-olhovivo_pega_previsao_linha_parada <- function(cod_linha, cod_parada) {
-  cod_linha <- as.character(cod_linha)
-  cod_parada <- as.character(cod_parada)
-  u <- url_base()
-  dados <- sprintf('/Previsao?codigoParada=%s&codigoLinha=%s', cod_parada, cod_linha)
-  u_busca_linha_parada <- paste0(u, dados)
-  r_busca_linha_parada <- httr::GET(u_busca_linha_parada)
-  d_busca_linha_parada <- jsonlite::fromJSON(httr::content(r_busca_linha_parada, 'text'))
-  if(is.null(d_busca_linha_parada$p)) return(data.frame())
-  d_prev <- d_busca_linha_parada$p$l$vs[[1]]
-  d_prev
-}
-
-#' @export
 olhovivo_pega_paradas <- function(query) {
   u <- url_base()
   dados <- sprintf('/Parada/Buscar?termosBusca=%s', URLencode(query))
@@ -116,20 +66,52 @@ olhovivo_pega_paradas <- function(query) {
   d_busca_parada
 }
 
-pega_bus <- function(color) {
-  inst <- 'https://raw.githubusercontent.com/jtrecenti/sptrans/master/inst'
-  path <- sprintf('%s/icons/%d-bus.png', inst, color)
-  js <- invisible(JS(sprintf("L.icon({ iconUrl: '%s', iconSize: [32, 37] })", path)))
-  js
+# -----------------------------------------------------------------------------
+
+olhovivo_pega_previsao_linhas_paradas <- function(cod_linhas, cod_paradas) {
+  linhas_olhovivo <- olhovivo_pega_linhas(cod_linhas)
+  comb <- expand.grid(
+    CodigoLinha = unique(linhas_olhovivo$CodigoLinha), 
+    stop_id = unique(as.numeric(cod_paradas)),
+    stringsAsFactors = FALSE
+  )
+  comb <- dplyr::inner_join(comb, linhas_olhovivo, c('CodigoLinha'))
+  comb <- dplyr::mutate(comb, direction = as.numeric(Sentido) - 1)
+  comb <- tidyr::unite(comb, trip_id, Letreiro, Tipo, direction, sep = '-', 
+                       remove = F)
+  # verifica na base stop_times se existe a combinacao
+  comb <- dplyr::semi_join(comb, stop_times, c('trip_id', 'stop_id'))
+  comb <- dplyr::group_by_(comb, .dots = names(comb))
+  d <- dplyr::do(comb, olhovivo_pega_previsao_linha_parada(.$CodigoLinha, 
+                                                           .$stop_id))
+  d <- dplyr::ungroup(d)
+  d
 }
 
-#' @export
+olhovivo_pega_previsao_linha_parada <- function(cod_linha, cod_parada) {
+  cod_linha <- as.character(cod_linha)
+  cod_parada <- as.character(cod_parada)
+  u <- url_base()
+  dados <- sprintf('/Previsao?codigoParada=%s&codigoLinha=%s', 
+                   cod_parada, cod_linha)
+  u_busca_linha_parada <- paste0(u, dados)
+  r_busca_linha_parada <- httr::GET(u_busca_linha_parada)
+  d_busca_linha_parada <- jsonlite::fromJSON(httr::content(r_busca_linha_parada, 
+                                                           'text'))
+  if(is.null(d_busca_linha_parada$p)) return(data.frame())
+  d_prev <- d_busca_linha_parada$p$l$vs[[1]]
+  d_prev
+}
+
+# -----------------------------------------------------------------------------
+
 leaflet_mapeia_linhas <- function(cod_linhas, sentido = NULL, m = NULL) {
   d <- olhovivo_pega_posicoes_linhas(cod_linhas)
   
   if(!is.null(sentido)) {
     d0 <- dplyr::data_frame(cod_linhas, sentido = sentido + 1)
-    d <- dplyr::inner_join(d, d0, c('linha' = 'cod_linhas', 'Sentido' = 'sentido'))
+    d <- dplyr::inner_join(d, d0, c('linha' = 'cod_linhas', 
+                                    'Sentido' = 'sentido'))
   }
   
   if(is.null(m)) {
@@ -153,8 +135,9 @@ leaflet_mapeia_linhas <- function(cod_linhas, sentido = NULL, m = NULL) {
 
 #' Desenha as shapes das linhas de onibus no mapa nao usa API
 #' 
-#' @export
-leaflet_desenha_shapes <- function(cod_linhas = NULL, shape_ids = NULL, m = NULL) {
+#' @import spgtfs
+leaflet_desenha_shapes <- function(cod_linhas = NULL, 
+                                   shape_ids = NULL, m = NULL) {
   if(!is.null(cod_linhas) & is.null(shape_ids)) {
     # pega ida e volta
     shape_ids <- dplyr::filter(trips, route_id %in% cod_linhas)
@@ -182,9 +165,15 @@ leaflet_desenha_shapes <- function(cod_linhas = NULL, shape_ids = NULL, m = NULL
   m
 }
 
-#' @export
 leaflet_fit_bounds_rad <- function(m, lng, lat, zoom, r) {
   m <- leaflet::setView(m, lng, lat, zoom)
   m <- leaflet::addCircles(m, lng, lat, radius = r)
   m
 }
+
+#' Desenha as paradas
+leaflet_stops <- function(stop_ids = NULL) {
+  leaflet_fit_bounds_rad
+  m
+}
+
