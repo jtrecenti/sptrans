@@ -85,7 +85,8 @@ OLHOVIVO_PAT=233f343e2ad2a3bf483eae00c316cfdd516c3xxxd21b6a3e916645877e137b6f
 ```
 
 **OBS:** O arquivo `.Renviron` deve ter uma linha vazia no final. Por exemplo,
-se seu arquivo contém só o token da API OlhoVivo, seu 
+se seu arquivo contém só o token da API OlhoVivo, seu arquivo deve ter duas
+linhas com uma linha vazia.
 
 6. Reinicie sua sessão do R. Um jeito fácil de fazer isso no RStudio é pelo
 atalho `Ctrl + Shift + F10`.
