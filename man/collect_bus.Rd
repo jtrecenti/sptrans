@@ -4,14 +4,20 @@
 \alias{collect_bus}
 \title{Coleta dados das posições de ônibus}
 \usage{
-collect_bus(.data, ids, type = c("trip", "route", "stop"), verbose = FALSE)
+collect_bus(.data, ids, type = c("trip", "route"))
 }
 \arguments{
-\item{.data}{contém a informação}
+\item{.data}{dados (geralmente coletados)
+pela função \code{\link{search_path}}.}
+
+\item{ids}{nome da coluna que tem os ids que desejamos pesquisar,
+geralmente \code{route_id} ou \code{trip_id}}
+
+\item{type}{tipo de pesquisa, podendo ser "trip" ou "route"}
 }
 \description{
 Coleta dados a partir de ids informados e do tipo de ids, podendo ser
-ids de linhas, rotas ou paradas.
+ids de linhas ou rotas. Pesquisa no máximo 8 trips ou rotas de uma vez.
 }
 \examples{
 trip_ids <- search_path(
@@ -22,7 +28,6 @@ trip_ids <- search_path(
 stop_ids <- nearby_stops('Avenida Paulista, 1079, São Paulo')
 
 trip_ids \%>\% collect_bus(trip_id, 'trip')
-trip_ids \%>\% collect_bus(route_id, 'stop')
-stop_ids \%>\% collect_bus(stop_id, 'stop')
+trip_ids \%>\% collect_bus(route_id, 'route')
 }
 

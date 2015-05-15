@@ -254,7 +254,7 @@ Observe que os ônibus realmente andam!
 Sys.sleep(10)
 trip_ids %>% 
   collect_bus(trip_id, 'trip') %>%
-  draw_bus()
+  draw_bus(m)
 ```
 
 ## TODO
