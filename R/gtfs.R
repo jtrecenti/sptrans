@@ -1,15 +1,3 @@
-#' Pipe operator
-#'
-#' See \code{\link[magrittr]{\%>\%}} for more details.
-#'
-#' @name %>%
-#' @rdname pipe
-#' @keywords internal
-#' @export
-#' @importFrom magrittr %>%
-#' @usage lhs \%>\% rhs
-NULL
-
 #' Identifica pontos de ônibus próximos
 #'
 #' Calcula distâncias entre um ponto escolhido e os pontos de ônibus, 
@@ -217,7 +205,7 @@ search_path <- function(end1 = NULL, end2 = NULL,
   d2 <- nearby_stops(end2, radius2, lon2, lat2)
 
   trips_validas <- stop_times %>% 
-    dplyr::distinct(trip_id, stop_id) %>%
+    dplyr::distinct(trip_id, stop_id, .keep_all = TRUE) %>%
     dplyr::left_join(dplyr::bind_rows(d1, d2), 'stop_id') %>%
     dplyr::arrange(distance) %>%
     dplyr::mutate(nc = nchar(trip_id), 
