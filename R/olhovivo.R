@@ -20,7 +20,7 @@ olhovivo_auth <- function(pat = olhovivo_pat()) {
   r <- httr::POST(u_login)
   result <- httr::content(r, 'text')
   if(result == 'true') {
-    cat('Autenticação realizada com sucesso!\n')
+    cat('Autenticacao realizada com sucesso\n')
     return(invisible(r))
   } else {
     stop('Ocorreu um erro ao acessar a API da SPTrans.')
@@ -114,6 +114,7 @@ collect_trips <- function(trip_ids) {
 #' @export
 #' 
 #' @examples
+#' \dontrun{
 #' trip_ids <- search_path(
 #'   end1 = 'Avenida 9 de Julho, 2000, São Paulo', 
 #'   end2 = 'Av. Pres. Juscelino Kubitschek, 500, São Paulo'
@@ -123,7 +124,7 @@ collect_trips <- function(trip_ids) {
 #' 
 #' trip_ids %>% collect_bus(trip_id, 'trip')
 #' trip_ids %>% collect_bus(route_id, 'route')
-#'
+#'}
 collect_bus <- function(.data, ids, type = c('trip', 'route')) {
   i <- eval(substitute(ids), .data, parent.frame())
   if(length(type) != 1) {
@@ -155,6 +156,7 @@ collect_bus <- function(.data, ids, type = c('trip', 'route')) {
 #' @export
 #' 
 #' @examples
+#' \dontrun{
 #' trip_ids <- search_path(
 #'   end1 = 'Avenida 9 de Julho, 2000, São Paulo', 
 #'   end2 = 'Av. Pres. Juscelino Kubitschek, 500, São Paulo'
@@ -165,7 +167,7 @@ collect_bus <- function(.data, ids, type = c('trip', 'route')) {
 #' trip_ids %>% 
 #'   collect_bus(trip_id, 'trip') %>% 
 #'   draw_bus()
-#' 
+#' }
 draw_bus <- function(.data, map = NULL) {
   if(is.null(map)) {
     map <- leaflet::leaflet() %>% 
