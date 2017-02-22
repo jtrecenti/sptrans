@@ -4,10 +4,11 @@ Version: 0.0.1.9001
 Authors@R: 'Julio Trecenti <julio.trecenti@gmail.com> [aut,cre]'
 Description: Pacote com ferramentas para facilitar uso da API Olho Vivo e o
     GTFS da SPTrans e desenhar no mapa.
-Depends: 
+Depends:
   R (>= 3.1.2)
-License: MIT
+License: MIT + file LICENSE
 LazyData: true
+Encoding: UTF-8
 Suggests: knitr,
     testthat
 VignetteBuilder: knitr
@@ -17,4 +18,12 @@ Imports: dplyr,
     htmltools,
     leaflet,
     httr,
-    jsonlite
+    jsonlite,
+    spgtfs,
+    magrittr,
+    V8,
+    ggmap,
+    tidyr
+Remotes:
+    jtrecenti/spgtfs
+RoxygenNote: 6.0.1
