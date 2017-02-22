@@ -9,10 +9,13 @@ vignette: >
   \usepackage[utf8]{inputenc}
 ---
 
+```{r}
+knitr::opts_chunk$set(eval = FALSE)
+```
+
 A SPTrans nasceu em 1995 e é hoje responsável por quase todo o sistema de
 transporte no município de São Paulo. Como São Paulo é o município mais
-populoso do Brasil (e o 
-[sétimo do mundo!](http://pt.wikipedia.org/wiki/Lista_das_cidades_mais_populosas_do_mundo))
+populoso do Brasil (e o [sétimo do mundo!](http://pt.wikipedia.org/wiki/Lista_das_cidades_mais_populosas_do_mundo))
 , o desafio é bem grande.
 
 A SPTrans também mantém uma das API's mais divertidas de São Paulo, o OlhoVivo.
