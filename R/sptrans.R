@@ -1,8 +1,3 @@
-# -----------------------------------------------------------------------------
-# DEPRECATED.
-# Essas funcoes serao utilizadas no futuro para montar a nova "API" do pacote.
-# -----------------------------------------------------------------------------
-
 olhovivo_pega_posicao <- function(cod_linha_olhovivo) {
   u <- url_base()
   u_busca_posicoes <- paste0(u, '/Posicao?codigoLinha=', cod_linha_olhovivo)
@@ -133,13 +128,9 @@ leaflet_mapeia_linhas <- function(cod_linhas, sentido = NULL, m = NULL) {
   m
 }
 
-#' Desenha as shapes das linhas de onibus no mapa nao usa API
-#' 
-#' @import spgtfs
 leaflet_desenha_shapes <- function(cod_linhas = NULL, 
                                    shape_ids = NULL, m = NULL) {
   if(!is.null(cod_linhas) & is.null(shape_ids)) {
-    # pega ida e volta
     shape_ids <- dplyr::filter(trips, route_id %in% cod_linhas)
     shape_ids <- unique(shape_ids$shape_id)
   }
@@ -171,7 +162,6 @@ leaflet_fit_bounds_rad <- function(m, lng, lat, zoom, r) {
   m
 }
 
-#' Desenha as paradas
 leaflet_stops <- function(stop_ids = NULL) {
   leaflet_fit_bounds_rad
   m
