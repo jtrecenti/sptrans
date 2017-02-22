@@ -1,48 +1,3 @@
-#' Identifica pontos de ônibus próximos
-#'
-#' Calcula distâncias entre um ponto escolhido e os pontos de ônibus, 
-#' retornando somente aqueles que estão dentro do raio informado.
-#'
-#' @param end Endereço para procurar (como se estivesse pesquisando no google maps).
-#' @param radius Raio em metros para procura dos pontos mais próximos. Por
-#'   padrão vale 300 metros.
-#' @param lon Longitude. Informar se o endereço for nulo.
-#' @param lat Latitude. Informar se o endereço for nulo.
-#' 
-#' @return Um data frame contendo um subset de \code{stops} 
-#'   (pacote \code{spgtfs}) com os pontos mais próximos, ordenados
-#'   por proximidade
-#' 
-#' @import spgtfs
-#' 
-#' @export
-#' @examples
-#' nearby_stops('Avenida Paulista, 1079')
-#' nearby_stops('Avenida Paulista, 1079', radius = 200)
-#' nearby_stops(lon = -46.6527, lat = -23.5648)
-nearby_stops <- function(end = NULL, radius = 300, lon = NULL, lat = NULL) {
-  if(is.null(end)) {
-    if(is.null(lon) | is.null(lat)) {
-      stop('Especifique um endereço ou longitude/latitude.')
-    }
-    coord <- as.numeric(c(lon, lat))
-  } else {
-    coord <- as.numeric(ggmap::geocode(end))
-  }
-  d <- stops
-  d$distance <- geodetic_distance_v(coord[1], coord[2], 
-                                    stops$stop_lon, stops$stop_lat)
-  d <- dplyr::filter(d, distance < radius)
-  if(nrow(d) == 0) {
-    stop('Nenhum ponto encontrado para o endereço e raio especificados.')
-  }
-  d <- dplyr::arrange(d, distance)
-  d$my_lon <- coord[1]
-  d$my_lat <- coord[2]
-  d$radius <- radius
-  d
-}
-
 # Retirado de http://www.biostat.umn.edu/~sudiptob/Software/distonearth.R
 geodetic_distance <- function(lon1, lat1, lon2, lat2) {
   R <- 6378388 # peguei esse valor da função rdist.earth do pacote fields
@@ -61,11 +16,15 @@ geodetic_distance_v <- Vectorize(geodetic_distance)
 #' um mapa com o lugar escolhido, o raio selecionado e os pontos de ônibus
 #' próximos.
 #' 
+#' @param .data dados
+#' 
 #' @return Um objeto HTML widget do pacote \code{leaflet}.
 #' 
 #' @export 
 #' @examples 
+#' \dontrun{
 #' nearby_stops('Avenida Paulista, 1079') %>% draw_stops()
+#' }
 draw_stops <- function(.data) {
   d <- .data
   m <- d %>%
@@ -83,13 +42,17 @@ draw_stops <- function(.data) {
 #' um mapa com os lugares escolhidos, os raios selecionados, os pontos de 
 #' ônibus próximos e os caminhos.
 #' 
+#' @param .data dados
+#' 
 #' @return Um objeto HTML widget do pacote \code{leaflet}.
 #' 
 #' @export 
 #' @examples 
+#' \dontrun{
 #' search_path(end1 = 'Avenida 9 de Julho, 2000, São Paulo', 
 #'             end2 = 'Av. Pres. Juscelino Kubitschek, 500, São Paulo') %>%
 #'  draw_paths()
+#' }
 draw_paths <- function(.data) {
   d <- .data
   
@@ -128,31 +91,32 @@ draw_paths <- function(.data) {
 }
 
 #' Procura pontos de ônibus próximos
-#'
-#' Calcula distâncias entre um ponto escolhido e os pontos de ônibus, 
-#' retornando somente aqueles que estão dentro do raio informado.
-#'
-#' @param end Endereço para procurar (como se estivesse pesquisando no google maps).
-#' @param radius Raio em metros para procura dos pontos mais próximos. Por
+#' 
+#' Calcula distâncias entre um ponto escolhido e os pontos de ônibus, retornando
+#' somente aqueles que estão dentro do raio informado.
+#' 
+#' @param end Endereço para procurar (como se estivesse pesquisando no google 
+#'   maps).
+#' @param radius Raio em metros para procura dos pontos mais próximos. Por 
 #'   padrão vale 300 metros.
 #' @param lon Longitude. Informar se o endereço for nulo.
 #' @param lat Latitude. Informar se o endereço for nulo.
-#' 
-#' @return Um data frame contendo um subset de \code{stops} 
-#'   (pacote \code{spgtfs}) com os pontos mais próximos, ordenados
-#'   por proximidade
-#' 
+#'   
+#' @return Um data frame contendo um subset de \code{stops} (pacote 
+#'   \code{spgtfs}) com os pontos mais próximos, ordenados por proximidade
+#'   
 #' @import spgtfs
-#' 
 #' @export
 #' @examples
+#' \dontrun{
 #' nearby_stops('Avenida Paulista, 1079')
 #' nearby_stops('Avenida Paulista, 1079', radius = 200)
 #' nearby_stops(lon = -46.6527, lat = -23.5648)
+#' }
 nearby_stops <- function(end = NULL, radius = 300, lon = NULL, lat = NULL) {
   if(is.null(end)) {
     if(is.null(lon) | is.null(lat)) {
-      stop('Especifique um endereço ou longitude/latitude.')
+      stop('Especifique um endereco ou longitude/latitude.')
     }
     coord <- as.numeric(c(lon, lat))
   } else {
@@ -163,7 +127,7 @@ nearby_stops <- function(end = NULL, radius = 300, lon = NULL, lat = NULL) {
                                     stops$stop_lon, stops$stop_lat)
   d <- dplyr::filter(d, distance < radius)
   if(nrow(d) == 0) {
-    stop('Nenhum ponto encontrado para o endereço e raio especificados.')
+    stop('Nenhum ponto encontrado para o endereco e raio especificados.')
   }
   d <- dplyr::arrange(d, distance)
   d$my_lon <- coord[1]
@@ -187,7 +151,7 @@ nearby_stops <- function(end = NULL, radius = 300, lon = NULL, lat = NULL) {
 #' @param lat1 Latitude de partida. Informar se o endereço for nulo.
 #' @param lon2 Longitude de destino. Informar se o endereço for nulo.
 #' @param lat2 Latitude de destino. Informar se o endereço for nulo.
-
+#'
 #' @return Um data frame contendo um subset de \code{trips} 
 #'   (pacote \code{spgtfs}) com as linhas que atendem aos critérios.
 #' 
@@ -195,8 +159,10 @@ nearby_stops <- function(end = NULL, radius = 300, lon = NULL, lat = NULL) {
 #' 
 #' @export
 #' @examples
+#' \dontrun{
 #' search_path(from = 'Avenida 9 de Julho, 2000', 
 #'             to = 'Av. Pres. Juscelino Kubitschek, 500')
+#' }
 search_path <- function(end1 = NULL, end2 = NULL, 
                         radius1 = 300, radius2 = 300,
                         lon1 = NULL, lat1 = NULL,
@@ -228,6 +194,13 @@ search_path <- function(end1 = NULL, end2 = NULL,
                   radius1 = d1$radius[1], radius2 = d2$radius[1])
   d
 }
+
+#' SP map
+#' 
+#' @format data.frame
+#' 
+#' @source \url{http://www.google.com/}
+"sp"
 
 # -----------------------------------------------------------------------------
 
